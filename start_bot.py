@@ -32,9 +32,13 @@ async def bye(ctx):
 
 @bot.command()
 async def stop(ctx):
-    print('stop')
+    if ctx.voice_client.is_playing():
+        await ctx.voice_client.stop()
+
+@bot.command()
+async def server_stop(ctx):
     if ctx.voice_client:
-        await ctx.voice_client.disconnect()
+        ctx.voice_client.disconnect()
     sys.exit()
 
 @bot.command()
