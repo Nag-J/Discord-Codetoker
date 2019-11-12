@@ -4,7 +4,6 @@ import subprocess
 import requests
 import os
 import sys
-import time
 import asyncio
 import traceback
 
@@ -15,10 +14,6 @@ INITIAL_EXTENSIONS = [
 TOKEN = sys.argv[1]
 ACTIVE_CHANNEL = sys.argv[2]
 VTEXT_KEY = sys.argv[3]
-
-talker = 'hikari'
-lines = []
-flagvt = False
 
 class Codetoker(commands.Bot):
     def __init__(self, command_prefix):
