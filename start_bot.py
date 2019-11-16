@@ -12,15 +12,22 @@ INITIAL_EXTENSIONS = [
 ]
 
 TOKEN = sys.argv[1]
-ACTIVE_CHANNEL = sys.argv[2]
-VTEXT_KEY = sys.argv[3]
+VTEXT_KEY = sys.argv[2]
 
 class Codetoker(commands.Bot):
     def __init__(self, command_prefix):
         super().__init__(command_prefix)
         self.talker = 'hikari'
+        self.talker_list = [
+            "hikari",
+            "haruka",
+            "takeru",
+            "show"
+        ]
         self.lines = []
         self.task = None
+        self.active_channel = []
+        self.active_player = []
 
         for cog in INITIAL_EXTENSIONS:
             try:
@@ -37,7 +44,7 @@ class Codetoker(commands.Bot):
             pass
         elif message.content.startswith('>'):
             await self.process_commands(message)
-        elif message.channel.id == int(ACTIVE_CHANNEL):
+        elif message.channel.id in self.active_channel and message.author.id in self.active_player:
             if message.guild.voice_client.is_connected():
                 if self.task is None or self.task.done():
                     self.task = asyncio.create_task( self.speak(message.guild.voice_client, message.content) )
