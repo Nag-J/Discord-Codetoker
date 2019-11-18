@@ -102,7 +102,7 @@ class CodetokerCog(commands.Cog):
     async def speed(self, ctx, value=100):
         if value >= 50 or value <= 200:
             self.bot.speed = value
-            ctx.send("声の速さを" + value + "%に設定しました")
+            ctx.send("声の速さを" + str(value) + "%に設定しました")
         else:
             ctx.send("その値は設定できません")
             
@@ -110,7 +110,7 @@ class CodetokerCog(commands.Cog):
     async def volume(self, ctx, value=100):
         if value >= 50 or value <= 200:
             self.bot.volume = value
-            ctx.send("声の大きさを" + value + "%に設定しました")
+            ctx.send("声の大きさを" + str(value) + "%に設定しました")
         else:
             ctx.send("その値は設定できません")
             
@@ -118,7 +118,7 @@ class CodetokerCog(commands.Cog):
     async def pitch(self, ctx, value=100):
         if value >= 50 or value <= 200:
             self.bot.pitch = value
-            ctx.send("声のピッチを" + value + "%に設定しました")
+            ctx.send("声のピッチを" + str(value) + "%に設定しました")
         else:
             ctx.send("その値は設定できません")
 
