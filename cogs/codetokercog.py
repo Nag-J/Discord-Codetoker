@@ -80,6 +80,27 @@ class CodetokerCog(commands.Cog):
             await ctx.send("あなたの声代理を務めないようにします")
         else:
             await ctx.send("既にあなたの声代理は務めていません")
+            
+    @commands.command()
+    async def stats(self, ctx):
+        vc = "\tNot connected\n"
+        if ctx.voice_client:
+            vc = "\tConnected\n"
+        channels = ""
+        players = ""
+        for channel_id in self.bot.active_channel:
+            channels += "\t" + self.bot.get_channel(channel_id).name + "\n"
+        for player_id in self.bot.active_player:
+            players += "\t" + self.bot.get_user(player_id).name + "\n"
+        if channels == "":
+            channels = "\tNone\n"
+        if players == "":
+            players = "\tNone\n"
+        
+        await ctx.send("STATS\n" +
+                       "Voice channel:\n" + vc +
+                       "Activated text channel(s):\n" + channels +
+                       "Joined player(s):\n" + players)
 
 def setup(bot):
     bot.add_cog(CodetokerCog(bot))
