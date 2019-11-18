@@ -98,5 +98,29 @@ class CodetokerCog(commands.Cog):
                        "Activated text channel(s):\n" + channels +
                        "Joined player(s):\n" + players)
 
+    @commands.command()
+    async def speed(self, ctx, value=100):
+        if value >= 50 and value <= 200:
+            self.bot.speed = value
+            await ctx.send("声の速さを" + str(value) + "%に設定しました")
+        else:
+            await ctx.send("その値は設定できません")
+            
+    @commands.command()
+    async def volume(self, ctx, value=100):
+        if value >= 50 and value <= 200:
+            self.bot.volume = value
+            await ctx.send("声の大きさを" + str(value) + "%に設定しました")
+        else:
+            await ctx.send("その値は設定できません")
+            
+    @commands.command()
+    async def pitch(self, ctx, value=100):
+        if value >= 50 and value <= 200:
+            self.bot.pitch = value
+            await ctx.send("声のピッチを" + str(value) + "%に設定しました")
+        else:
+            await ctx.send("その値は設定できません")
+
 def setup(bot):
     bot.add_cog(CodetokerCog(bot))
