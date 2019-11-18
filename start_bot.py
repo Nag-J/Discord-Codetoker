@@ -26,6 +26,9 @@ class Codetoker(commands.Bot):
             "santa",
             "bear"
         ]
+        self.speed = 100
+        self.volume = 100
+        self.pitch = 100
         self.lines = []
         self.task = None
         self.active_channel = []
@@ -56,7 +59,10 @@ class Codetoker(commands.Bot):
     async def speak(self, voice_client, message):
         data = {
             'text': message,
-            'speaker': self.talker
+            'speaker': self.talker,
+            'speed': str(self.speed),
+            'volume': str(self.volume),
+            'pitch': str(self.pitch)
         }
 
         response = requests.post('https://api.VoiceText.jp/v1/tts', data=data, auth=(VTEXT_KEY, ''))
