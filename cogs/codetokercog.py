@@ -35,13 +35,6 @@ class CodetokerCog(commands.Cog):
         await ctx.send("しゃべってません")
 
     @commands.command()
-    async def server_stop(self, ctx):
-        print('server_stop')
-        if ctx.voice_client:
-            await ctx.voice_client.disconnect()
-        sys.exit()
-
-    @commands.command()
     async def change(self, ctx, message):
         print('change')
         if message in self.bot.talker_list:
