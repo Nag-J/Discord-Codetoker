@@ -20,8 +20,11 @@ class CodetokerCog(commands.Cog):
     @commands.command()
     async def seeyou(self, ctx):
         print('leave')
-        await ctx.voice_client.disconnect()
-        await ctx.send("おやすみなさい")
+        if ctx.voice_client:
+            await ctx.voice_client.disconnect()
+            await ctx.send("おやすみなさい")
+        else:
+            await ctx.send("Voice Channelに参加していません")
 
     @commands.command()
     async def stop(self, ctx):
