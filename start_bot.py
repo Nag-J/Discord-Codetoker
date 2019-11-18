@@ -22,7 +22,9 @@ class Codetoker(commands.Bot):
             "hikari",
             "haruka",
             "takeru",
-            "show"
+            "show",
+            "santa",
+            "bear"
         ]
         self.lines = []
         self.task = None
