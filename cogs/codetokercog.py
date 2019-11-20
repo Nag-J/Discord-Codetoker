@@ -121,6 +121,10 @@ class CodetokerCog(commands.Cog):
             await ctx.send("声のピッチを" + str(value) + "%に設定しました")
         else:
             await ctx.send("その値は設定できません")
+    
+    @commands.command()
+    async def dontr():
+        pass
 
 def setup(bot):
     bot.add_cog(CodetokerCog(bot))
