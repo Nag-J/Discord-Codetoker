@@ -35,13 +35,6 @@ class CodetokerCog(commands.Cog):
         await ctx.send("しゃべってません")
 
     @commands.command()
-    async def server_stop(self, ctx):
-        print('server_stop')
-        if ctx.voice_client:
-            await ctx.voice_client.disconnect()
-        sys.exit()
-
-    @commands.command()
     async def change(self, ctx, message):
         print('change')
         if message in self.bot.talker_list:
@@ -104,6 +97,34 @@ class CodetokerCog(commands.Cog):
                        "Voice channel:\n" + vc +
                        "Activated text channel(s):\n" + channels +
                        "Joined player(s):\n" + players)
+
+    @commands.command()
+    async def speed(self, ctx, value=100):
+        if value >= 50 and value <= 200:
+            self.bot.speed = value
+            await ctx.send("声の速さを" + str(value) + "%に設定しました")
+        else:
+            await ctx.send("その値は設定できません")
+            
+    @commands.command()
+    async def volume(self, ctx, value=100):
+        if value >= 50 and value <= 200:
+            self.bot.volume = value
+            await ctx.send("声の大きさを" + str(value) + "%に設定しました")
+        else:
+            await ctx.send("その値は設定できません")
+            
+    @commands.command()
+    async def pitch(self, ctx, value=100):
+        if value >= 50 and value <= 200:
+            self.bot.pitch = value
+            await ctx.send("声のピッチを" + str(value) + "%に設定しました")
+        else:
+            await ctx.send("その値は設定できません")
+    
+    @commands.command()
+    async def dontr(self, ctx, message=None):
+        pass
 
 def setup(bot):
     bot.add_cog(CodetokerCog(bot))

@@ -6,13 +6,11 @@ import os
 import sys
 import asyncio
 import traceback
+import configparser
 
 INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
 ]
-
-TOKEN = sys.argv[1]
-VTEXT_KEY = sys.argv[2]
 
 class Codetoker(commands.Bot):
     def __init__(self, command_prefix):
@@ -22,12 +20,24 @@ class Codetoker(commands.Bot):
             "hikari",
             "haruka",
             "takeru",
-            "show"
+            "show",
+            "santa",
+            "bear"
         ]
+        self.speed = 100
+        self.volume = 100
+        self.pitch = 100
         self.lines = []
         self.task = None
         self.active_channel = []
         self.active_player = []
+
+        config = configparser.ConfigParser()
+        config.read(os.path.dirname(os.path.abspath(__file__)) + '/config.ini')
+        print('read: ' + os.path.dirname(os.path.abspath(__file__)) + '/config.ini')
+
+        self.token = config['Keys']['bot_key']
+        self.vtext_key = config['Keys']['voice_text_key']
 
         for cog in INITIAL_EXTENSIONS:
             try:
@@ -54,10 +64,13 @@ class Codetoker(commands.Bot):
     async def speak(self, voice_client, message):
         data = {
             'text': message,
-            'speaker': self.talker
+            'speaker': self.talker,
+            'speed': str(self.speed),
+            'volume': str(self.volume),
+            'pitch': str(self.pitch)
         }
 
-        response = requests.post('https://api.VoiceText.jp/v1/tts', data=data, auth=(VTEXT_KEY, ''))
+        response = requests.post('https://api.VoiceText.jp/v1/tts', data=data, auth=(self.vtext_key, ''))
         f = open("vtext.wav", 'wb')
         f.write(response.content)
         f.close()
@@ -70,4 +83,4 @@ class Codetoker(commands.Bot):
             await self.speak(voice_client, self.lines.pop())
                 
 bot = Codetoker(command_prefix='>')
-bot.run(TOKEN)
+bot.run(bot.token)
