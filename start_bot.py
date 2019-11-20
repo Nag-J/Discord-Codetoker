@@ -33,7 +33,8 @@ class Codetoker(commands.Bot):
         self.active_player = []
 
         config = configparser.ConfigParser()
-        config.read(os.path.dirname(__file__) + '/config.ini')
+        config.read(os.path.dirname(os.path.abspath(__file__)) + '/config.ini')
+        print('read: ' + os.path.dirname(os.path.abspath(__file__)) + '/config.ini')
 
         self.token = config['Keys']['bot_key']
         self.vtext_key = config['Keys']['voice_text_key']
