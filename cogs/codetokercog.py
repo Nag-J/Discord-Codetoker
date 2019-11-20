@@ -123,7 +123,7 @@ class CodetokerCog(commands.Cog):
             await ctx.send("その値は設定できません")
     
     @commands.command()
-    async def dontr():
+    async def dontr(self, ctx, message=None):
         pass
 
 def setup(bot):
