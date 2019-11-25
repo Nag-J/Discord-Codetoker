@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import subprocess
 import requests
+import signal
 import os
 import sys
 import asyncio
@@ -83,6 +84,22 @@ class Codetoker(commands.Bot):
             await asyncio.sleep(0.3)
         if self.lines:
             await self.speak(voice_client, self.lines.pop())
-                
+
 bot = Codetoker(command_prefix='>')
-bot.run(bot.token)
+
+loop = asyncio.get_event_loop()
+
+def sigterm_handler(signum, frame):
+    print('sigterm')
+    sys.exit()
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
+try:
+    loop.run_until_complete(bot.start(bot.token))
+except KeyboardInterrupt:
+    sys.exit()
+finally:
+    loop.run_until_complete(bot.close())
+    loop.close()
+    print('kill')
