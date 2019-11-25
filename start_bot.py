@@ -9,6 +9,7 @@ import asyncio
 import traceback
 import configparser
 import redis
+import pickle
 
 INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
@@ -57,20 +58,27 @@ class Codetoker(commands.Bot):
             pass
         elif message.content.startswith('>'):
             await self.process_commands(message)
-        elif self.redis.sismember('active_channels', message.channel.id) == 1 and self.redis.sismember('active_users', message.author.id):
-            if message.guild.voice_client.is_connected():
-                if self.task is None or self.task.done():
-                    self.task = asyncio.create_task( self.speak(message.guild.voice_client, message.content) )
-                else:
-                    self.lines.append(message.content)
+        elif self.redis.sismember('active_channels', message.channel.id) == 1:
+            if self.redis.hexists('active_users', message.author.id) == 1:
+                if message.guild.voice_client.is_connected():
+                    if self.task is None or self.task.done():
+                        self.task = asyncio.create_task(
+                            self.speak(
+                                message.guild.voice_client,
+                                message.content,
+                                pickle.loads(self.redis.hget('active_users', message.author.id))
+                            )
+                        )
+                    else:
+                        self.lines.append(message.content)
 
-    async def speak(self, voice_client, message):
+    async def speak(self, voice_client, message, user_conf):
         data = {
             'text': message,
             'speaker': self.talker,
-            'speed': str(self.speed),
-            'volume': str(self.volume),
-            'pitch': str(self.pitch)
+            'speed': str(user_conf['speed']),
+            'volume': str(user_conf['volume']),
+            'pitch': str(user_conf['pitch'])
         }
 
         response = requests.post('https://api.VoiceText.jp/v1/tts', data=data, auth=(self.vtext_key, ''))
