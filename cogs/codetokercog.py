@@ -1,5 +1,6 @@
 from discord.ext import commands
 import sys
+import pickle
 
 class CodetokerCog(commands.Cog):
     def __init__(self, bot):
@@ -46,78 +47,73 @@ class CodetokerCog(commands.Cog):
     @commands.command()
     async def activate(self, ctx):
         print('activate')
-        if ctx.channel.id in self.bot.active_channel:
+        if self.bot.redis.sismember("active_channels", ctx.channel.id) == 1:
             await ctx.send("既にこのチャンネルの声代理を務めています")
         else:
-            self.bot.active_channel.append(ctx.channel.id)
+            self.bot.redis.sadd("active_channels", ctx.channel.id)
             await ctx.send("このチャンネルの声代理を務めます")
 
     @commands.command()
     async def inactivate(self, ctx):
         print('inactivate')
-        if ctx.channel.id in self.bot.active_channel:
-            self.bot.active_channel.pop(self.bot.active_channel.index(ctx.channel.id))
+        if self.bot.redis.sismember("active_channels", ctx.channel.id) == 1:
+            self.bot.redis.srem("active_channels", ctx.channel.id)
             await ctx.send("このチャンネルの声代理を務めないようにします")
         else:
             await ctx.send("既にこのチャンネルの声代理は務めていません")
 
     @commands.command()
     async def join(self, ctx):
-        if ctx.author.id in self.bot.active_player:
+        if self.bot.redis.hexists("active_users", ctx.author.id) == 1:
             await ctx.send("既にあなたの声代理を務めています")
         else:
-            self.bot.active_player.append(ctx.author.id)
+            self.bot.redis.hsetnx("active_users", ctx.author.id, pickle.dumps({
+                'pitch' : 100,
+                'speed' : 100,
+                'volume' : 100
+            }, protocol=pickle.HIGHEST_PROTOCOL))
             await ctx.send("あなたの声代理を務めます")
 
     @commands.command()
     async def bye(self, ctx):
-        if ctx.author.id in self.bot.active_player:
-            self.bot.active_player.pop(self.bot.active_player.index(ctx.author.id))
+        if self.bot.redis.hexists("active_users", ctx.author.id) == 1:
+            self.bot.redis.hdel("active_users", ctx.author.id)
             await ctx.send("あなたの声代理を務めないようにします")
         else:
             await ctx.send("既にあなたの声代理は務めていません")
-            
-    @commands.command()
-    async def stats(self, ctx):
-        vc = "\tNot connected\n"
-        if ctx.voice_client:
-            vc = "\tConnected\n"
-        channels = ""
-        players = ""
-        for channel_id in self.bot.active_channel:
-            channels += "\t" + self.bot.get_channel(channel_id).name + "\n"
-        for player_id in self.bot.active_player:
-            players += "\t" + self.bot.get_user(player_id).name + "\n"
-        if channels == "":
-            channels = "\tNone\n"
-        if players == "":
-            players = "\tNone\n"
-        
-        await ctx.send("STATS\n" +
-                       "Voice channel:\n" + vc +
-                       "Activated text channel(s):\n" + channels +
-                       "Joined player(s):\n" + players)
 
     @commands.command()
     async def speed(self, ctx, value=100):
-        if value >= 50 and value <= 200:
-            self.bot.speed = value
+        if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
+            await ctx.send("先にjoinコマンドで参加してください")
+        elif value >= 50 and value <= 200:
+            data = pickle.loads(self.bot.redis.hget("active_users", ctx.author.id) )
+            data['speed'] = value
+            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL) )
             await ctx.send("声の速さを" + str(value) + "%に設定しました")
         else:
             await ctx.send("その値は設定できません")
             
     @commands.command()
     async def volume(self, ctx, value=100):
-        if value >= 50 and value <= 200:
-            self.bot.volume = value
+        if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
+            await ctx.send("先にjoinコマンドで参加してください")
+        elif value >= 50 and value <= 200:
+            data = pickle.loads(self.bot.redis.hget("active_users", ctx.author.id) )
+            data['volume'] = value
+            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL) )
             await ctx.send("声の大きさを" + str(value) + "%に設定しました")
         else:
             await ctx.send("その値は設定できません")
             
     @commands.command()
     async def pitch(self, ctx, value=100):
-        if value >= 50 and value <= 200:
-            self.bot.pitch = value
+        if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
+            await ctx.send("先にjoinコマンドで参加してください")
+        elif value >= 50 and value <= 200:
+            data = pickle.loads(self.bot.redis.hget("active_users", ctx.author.id) )
+            data['pitch'] = value
+            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL) )
             await ctx.send("声のピッチを" + str(value) + "%に設定しました")
         else:
             await ctx.send("その値は設定できません")
