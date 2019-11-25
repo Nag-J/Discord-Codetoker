@@ -27,9 +27,6 @@ class Codetoker(commands.Bot):
             "santa",
             "bear"
         ]
-        self.speed = 100
-        self.volume = 100
-        self.pitch = 100
         self.lines = []
         self.task = None
 
