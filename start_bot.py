@@ -7,6 +7,7 @@ import sys
 import asyncio
 import traceback
 import configparser
+import redis
 
 INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
@@ -29,8 +30,6 @@ class Codetoker(commands.Bot):
         self.pitch = 100
         self.lines = []
         self.task = None
-        self.active_channel = []
-        self.active_player = []
 
         config = configparser.ConfigParser()
         config.read(os.path.dirname(os.path.abspath(__file__)) + '/config.ini')
@@ -38,6 +37,9 @@ class Codetoker(commands.Bot):
 
         self.token = config['Keys']['bot_key']
         self.vtext_key = config['Keys']['voice_text_key']
+        
+        pool = redis.ConnectionPool(host = config['Redis']['host'], port = int(config['Redis']['port']), db = int(config['Redis']['number']) )
+        self.redis = redis.StrictRedis(connection_pool = pool)
 
         for cog in INITIAL_EXTENSIONS:
             try:
@@ -54,7 +56,7 @@ class Codetoker(commands.Bot):
             pass
         elif message.content.startswith('>'):
             await self.process_commands(message)
-        elif message.channel.id in self.active_channel and message.author.id in self.active_player:
+        elif self.redis.sismember('active_channels', message.channel.id) == 1 and self.redis.sismember('active_users', message.author.id):
             if message.guild.voice_client.is_connected():
                 if self.task is None or self.task.done():
                     self.task = asyncio.create_task( self.speak(message.guild.voice_client, message.content) )
