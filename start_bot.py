@@ -9,7 +9,7 @@ import asyncio
 import traceback
 import configparser
 import redis
-import pickle
+import _pickle as pickle
 
 INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
@@ -27,9 +27,6 @@ class Codetoker(commands.Bot):
             "santa",
             "bear"
         ]
-        self.speed = 100
-        self.volume = 100
-        self.pitch = 100
         self.lines = []
         self.task = None
 
