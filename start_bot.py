@@ -9,7 +9,7 @@ import asyncio
 import traceback
 import configparser
 import redis
-import pickle
+import _pickle as pickle
 
 INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
