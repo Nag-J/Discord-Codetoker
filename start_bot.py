@@ -57,7 +57,7 @@ class Codetoker(commands.Bot):
             await self.process_commands(message)
         elif self.redis.sismember('active_channels', message.channel.id) == 1:
             if self.redis.hexists('active_users', message.author.id) == 1:
-                if message.guild.voice_client.is_connected():
+                if message.guild.voice_client is not None:
                     if self.task is None or self.task.done():
                         self.task = asyncio.create_task(
                             self.speak(
@@ -68,6 +68,7 @@ class Codetoker(commands.Bot):
                         )
                     else:
                         self.lines.append(message.content)
+                        print('append to lines')
 
     async def speak(self, voice_client, message, user_conf):
         data = {
@@ -84,11 +85,15 @@ class Codetoker(commands.Bot):
         f.close()
         source = discord.FFmpegPCMAudio("vtext.wav")
         voice_client.play(source)
-        print('played')
+        print('play')
+
         while voice_client.is_playing():
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(0.1)
+            print('speaking')
+
         if self.lines:
-            await self.speak(voice_client, self.lines.pop())
+            print('pop lines')
+            await self.speak(voice_client, self.lines.pop(), user_conf)
 
 bot = Codetoker(command_prefix='>')
 
