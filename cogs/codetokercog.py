@@ -8,7 +8,7 @@ class CodetokerCog(commands.Cog):
 
     @commands.command()
     async def invite(self, ctx):
-        print('join')
+        print('invite')
         if ctx.voice_client:
             await ctx.send("もう呼ばれてます")
         else:
@@ -20,7 +20,7 @@ class CodetokerCog(commands.Cog):
 
     @commands.command()
     async def seeyou(self, ctx):
-        print('leave')
+        print('see you')
         if ctx.voice_client:
             await ctx.voice_client.disconnect()
             await ctx.send("おやすみなさい")
@@ -64,6 +64,7 @@ class CodetokerCog(commands.Cog):
 
     @commands.command()
     async def join(self, ctx):
+        print('join')
         if self.bot.redis.hexists("active_users", ctx.author.id) == 1:
             await ctx.send("既にあなたの声代理を務めています")
         else:
@@ -76,6 +77,7 @@ class CodetokerCog(commands.Cog):
 
     @commands.command()
     async def bye(self, ctx):
+        print('bye')
         if self.bot.redis.hexists("active_users", ctx.author.id) == 1:
             self.bot.redis.hdel("active_users", ctx.author.id)
             await ctx.send("あなたの声代理を務めないようにします")
@@ -84,6 +86,7 @@ class CodetokerCog(commands.Cog):
 
     @commands.command()
     async def speed(self, ctx, value=100):
+        print('speed')
         if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
             await ctx.send("先にjoinコマンドで参加してください")
         elif value >= 50 and value <= 200:
@@ -96,6 +99,7 @@ class CodetokerCog(commands.Cog):
             
     @commands.command()
     async def volume(self, ctx, value=100):
+        print('volume')
         if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
             await ctx.send("先にjoinコマンドで参加してください")
         elif value >= 50 and value <= 200:
@@ -108,6 +112,7 @@ class CodetokerCog(commands.Cog):
             
     @commands.command()
     async def pitch(self, ctx, value=100):
+        print('pitch')
         if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
             await ctx.send("先にjoinコマンドで参加してください")
         elif value >= 50 and value <= 200:
