@@ -2,6 +2,7 @@ from discord.ext import commands
 import sys
 import pickle
 
+
 class CodetokerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -69,9 +70,9 @@ class CodetokerCog(commands.Cog):
             await ctx.send("既にあなたの声代理を務めています")
         else:
             self.bot.redis.hsetnx("active_users", ctx.author.id, pickle.dumps({
-                'pitch' : 100,
-                'speed' : 100,
-                'volume' : 100
+                'pitch': 100,
+                'speed': 100,
+                'volume': 100
             }, protocol=pickle.HIGHEST_PROTOCOL))
             await ctx.send("あなたの声代理を務めます")
 
@@ -90,42 +91,49 @@ class CodetokerCog(commands.Cog):
         if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
             await ctx.send("先にjoinコマンドで参加してください")
         elif value >= 50 and value <= 200:
-            data = pickle.loads(self.bot.redis.hget("active_users", ctx.author.id) )
+            data = pickle.loads(self.bot.redis.hget(
+                "active_users", ctx.author.id))
             data['speed'] = value
-            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL) )
+            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(
+                data, protocol=pickle.HIGHEST_PROTOCOL))
             await ctx.send("声の速さを" + str(value) + "%に設定しました")
         else:
             await ctx.send("その値は設定できません")
-            
+
     @commands.command()
     async def volume(self, ctx, value=100):
         print('volume')
         if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
             await ctx.send("先にjoinコマンドで参加してください")
         elif value >= 50 and value <= 200:
-            data = pickle.loads(self.bot.redis.hget("active_users", ctx.author.id) )
+            data = pickle.loads(self.bot.redis.hget(
+                "active_users", ctx.author.id))
             data['volume'] = value
-            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL) )
+            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(
+                data, protocol=pickle.HIGHEST_PROTOCOL))
             await ctx.send("声の大きさを" + str(value) + "%に設定しました")
         else:
             await ctx.send("その値は設定できません")
-            
+
     @commands.command()
     async def pitch(self, ctx, value=100):
         print('pitch')
         if self.bot.redis.hexists("active_users", ctx.author.id) == 0:
             await ctx.send("先にjoinコマンドで参加してください")
         elif value >= 50 and value <= 200:
-            data = pickle.loads(self.bot.redis.hget("active_users", ctx.author.id) )
+            data = pickle.loads(self.bot.redis.hget(
+                "active_users", ctx.author.id))
             data['pitch'] = value
-            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL) )
+            self.bot.redis.hset("active_users", ctx.author.id, pickle.dumps(
+                data, protocol=pickle.HIGHEST_PROTOCOL))
             await ctx.send("声のピッチを" + str(value) + "%に設定しました")
         else:
             await ctx.send("その値は設定できません")
-    
+
     @commands.command()
     async def dontr(self, ctx, message=None):
         pass
+
 
 def setup(bot):
     bot.add_cog(CodetokerCog(bot))

@@ -15,6 +15,7 @@ INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
 ]
 
+
 class Codetoker(commands.Bot):
     def __init__(self, command_prefix):
         super().__init__(command_prefix)
@@ -36,9 +37,10 @@ class Codetoker(commands.Bot):
 
         self.token = config['Keys']['bot_key']
         self.vtext_key = config['Keys']['voice_text_key']
-        
-        pool = redis.ConnectionPool(host = config['Redis']['host'], port = int(config['Redis']['port']), db = int(config['Redis']['number']) )
-        self.redis = redis.StrictRedis(connection_pool = pool)
+
+        pool = redis.ConnectionPool(host=config['Redis']['host'], port=int(
+            config['Redis']['port']), db=int(config['Redis']['number']))
+        self.redis = redis.StrictRedis(connection_pool=pool)
 
         for cog in INITIAL_EXTENSIONS:
             try:
@@ -63,7 +65,8 @@ class Codetoker(commands.Bot):
                             self.speak(
                                 message.guild.voice_client,
                                 message.content,
-                                pickle.loads(self.redis.hget('active_users', message.author.id))
+                                pickle.loads(self.redis.hget(
+                                    'active_users', message.author.id))
                             )
                         )
                     else:
@@ -79,7 +82,8 @@ class Codetoker(commands.Bot):
             'pitch': str(user_conf['pitch'])
         }
 
-        response = requests.post('https://api.VoiceText.jp/v1/tts', data=data, auth=(self.vtext_key, ''))
+        response = requests.post(
+            'https://api.VoiceText.jp/v1/tts', data=data, auth=(self.vtext_key, ''))
         f = open("vtext.wav", 'wb')
         f.write(response.content)
         f.close()
@@ -95,13 +99,16 @@ class Codetoker(commands.Bot):
             print('pop lines')
             await self.speak(voice_client, self.lines.pop(), user_conf)
 
+
 bot = Codetoker(command_prefix='>')
 
 loop = asyncio.get_event_loop()
 
+
 def sigterm_handler(signum, frame):
     print('sigterm')
     sys.exit()
+
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 
