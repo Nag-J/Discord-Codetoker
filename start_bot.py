@@ -70,7 +70,8 @@ class Codetoker(commands.Bot):
                             )
                         )
                     else:
-                        self.lines.append(message.content)
+                        self.lines.append(
+                            {"user": message.author.id, "message": message.content}.copy())
                         print('append to lines')
 
     async def speak(self, voice_client, message, user_conf):
@@ -97,7 +98,10 @@ class Codetoker(commands.Bot):
 
         if self.lines:
             print('pop lines')
-            await self.speak(voice_client, self.lines.pop(), user_conf)
+            line = self.lines.pop()
+            data = pickle.loads(self.redis.hget(
+                "active_users", line["user"]))
+            await self.speak(voice_client, line["message"], data)
 
 
 bot = Codetoker(command_prefix='>')
