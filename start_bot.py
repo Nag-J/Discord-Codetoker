@@ -10,6 +10,7 @@ import traceback
 import configparser
 import redis
 import _pickle as pickle
+import wave
 
 INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
@@ -21,12 +22,12 @@ class Codetoker(commands.Bot):
         super().__init__(command_prefix)
         self.talker = 'hikari'
         self.talker_list = [
-            "hikari",
-            "haruka",
-            "takeru",
-            "show",
-            "santa",
-            "bear"
+            'hikari',
+            'haruka',
+            'takeru',
+            'show',
+            'santa',
+            'bear'
         ]
         self.lines = []
         self.task = None
@@ -71,7 +72,7 @@ class Codetoker(commands.Bot):
                         )
                     else:
                         self.lines.append(
-                            {"user": message.author.id, "message": message.content}.copy())
+                            {'user': message.author.id, 'message': message.content}.copy())
                         print('append to lines')
 
     async def speak(self, voice_client, message, user_conf):
@@ -85,23 +86,22 @@ class Codetoker(commands.Bot):
 
         response = requests.post(
             'https://api.VoiceText.jp/v1/tts', data=data, auth=(self.vtext_key, ''))
-        f = open("vtext.wav", 'wb')
+        f = open('vtext.wav', 'wb')
         f.write(response.content)
         f.close()
-        source = discord.FFmpegPCMAudio("vtext.wav")
+        source = discord.FFmpegPCMAudio('vtext.wav')
         voice_client.play(source)
         print('play')
 
-        while voice_client.is_playing():
-            await asyncio.sleep(0.1)
-            print('speaking')
+        wf = wave.open('vtext.wav', 'r')
+        await asyncio.sleep(float(wf.getnframes()) / wf.getframerate())
 
         if self.lines:
             print('pop lines')
             line = self.lines.pop()
             data = pickle.loads(self.redis.hget(
-                "active_users", line["user"]))
-            await self.speak(voice_client, line["message"], data)
+                'active_users', line['user']))
+            await self.speak(voice_client, line['message'], data)
 
 
 bot = Codetoker(command_prefix='>')
