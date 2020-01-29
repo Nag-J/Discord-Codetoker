@@ -11,6 +11,7 @@ import configparser
 import redis
 import _pickle as pickle
 import wave
+import re
 INITIAL_EXTENSIONS = [
     'cogs.codetokercog'
 ]
@@ -59,20 +60,23 @@ class Codetoker(commands.Bot):
                     if self.task is None or self.task.done():
                         self.task = asyncio.create_task(
                             self.speak(
-                                message.guild.voice_client,
-                                message.content,
+                                message,
                                 pickle.loads(self.redis.hget(
                                     'active_users', message.author.id))
                             )
                         )
                     else:
                         self.lines.append(
-                            {'user': message.author.id, 'message': message.content}.copy())
+                            {'user': message.author.id, 'message': message}.copy())
                         print('append to lines')
 
-    async def speak(self, voice_client, message, user_conf):
+    async def speak(self, message, user_conf):
+        speech_message = message.content
+        for m in message.mentions:
+            speech_message = re.sub(
+                '<@!' + str(m.id) + '>', str(m.display_name), speech_message)
         data = {
-            'text': message,
+            'text': speech_message,
             'speaker': self.talker,
             'speed': str(user_conf['speed']),
             'volume': str(user_conf['volume']),
@@ -84,8 +88,8 @@ class Codetoker(commands.Bot):
         f.write(response.content)
         f.close()
         source = discord.FFmpegPCMAudio('vtext.wav')
-        voice_client.play(source)
-        print('play')
+        message.guild.voice_client.play(source)
+        print('play: ' + speech_message)
         wf = wave.open('vtext.wav', 'r')
         await asyncio.sleep(float(wf.getnframes()) / wf.getframerate())
         if self.lines:
@@ -93,7 +97,7 @@ class Codetoker(commands.Bot):
             line = self.lines.pop()
             data = pickle.loads(self.redis.hget(
                 'active_users', line['user']))
-            await self.speak(voice_client, line['message'], data)
+            await self.speak(line['message'], data)
 
     async def on_voice_state_update(self, member, before, after):
         for v in self.voice_clients:
