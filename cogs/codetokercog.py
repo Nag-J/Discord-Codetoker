@@ -34,7 +34,8 @@ class CodetokerCog(commands.Cog):
         if ctx.voice_client.is_playing():
             ctx.voice_client.stop()
             await ctx.send("！！")
-        await ctx.send("しゃべってません")
+        else:
+            await ctx.send("しゃべってません")
 
     @commands.command()
     async def change(self, ctx, message):
