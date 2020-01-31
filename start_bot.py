@@ -76,7 +76,7 @@ class Codetoker(commands.Bot):
             speech_message = re.sub(
                 '<@!' + str(m.id) + '>', str(m.display_name), speech_message)
         speech_message = re.sub(
-            r'(http|https):\/\/([\w\-]+\.)+[\w\-]+(\/[\w\-.\/?%&=]*)?$', 'URL', speech_message)
+            r'(http|https):\/\/([\w\-]+\.)+[\w\-]+(\/[\w\-.\/?%&=]*)?', 'URL', speech_message)
         data = {
             'text': speech_message,
             'speaker': self.talker,
